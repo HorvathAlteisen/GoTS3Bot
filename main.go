@@ -1,15 +1,14 @@
 package main
 
 import (
-		"GoTS3ServerQuery"
+	"github.com/HorvathAlteisen/GoTS3Bot/TS3ServerQuery"
 )
 
- 
 func main() {
 
-	ServerQuery query = new(ServerQuery)
-	query.NewQuery("127.0.0.1");
+	query, _ := TS3ServerQuery.NewQuery("127.0.0.1")
 
+	defer query.Close()
 
 	return
 }
