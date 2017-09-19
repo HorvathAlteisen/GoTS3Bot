@@ -2,8 +2,6 @@ package ts3
 
 import (
 	"fmt"
-
-	"github.com/HorvathAlteisen/GoTS3Bot/ts3"
 )
 
 // Bot stores a new Bot instance
@@ -14,11 +12,11 @@ type Bot struct {
 // NewBot creates a new Bot instance
 func NewBot(query *ServerQuery) Bot {
 
-	bot := new(ts3.Bot)
+	bot := new(Bot)
 
 	bot.query = query
 
-	return bot
+	return *bot
 
 }
 

@@ -1,14 +1,15 @@
 package main
 
-import "github.com/HorvathAlteisen/GoTS3Bot/ts3"
+import "github.com/HorvathAlteisen/GoTS3Bot/pkg/ts3/query"
+import "github.com/HorvathAlteisen/GoTS3Bot/pkg/ts3/bot"
 
 func main() {
 
 	query, _ := ts3.NewQuery("127.0.0.1:10011")
 
-	bot, _ := ts3.NewBot(query)
+	query
 
-	defer bot.Close()
+	defer query.Close()
 
 	return
 }
