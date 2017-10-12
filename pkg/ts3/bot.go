@@ -1,9 +1,5 @@
 package ts3
 
-import (
-	"fmt"
-)
-
 // Bot stores a new Bot instance
 type Bot struct {
 	query *ServerQuery
@@ -18,7 +14,7 @@ func NewBot(query *ServerQuery) Bot {
 
 	return *bot
 
-}
+} /*
 
 // Login logs a user in to the ServerQuery
 func (bot *Bot) Login(user string, password string) (string, error) {
@@ -39,4 +35,4 @@ func (bot *Bot) Close() error {
 	bot.query.SendCommand("quit")
 	return bot.query.Close()
 
-}
+}*/
