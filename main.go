@@ -1,20 +1,15 @@
 package main
 
-<<<<<<< HEAD
 import (
 	"html/template"
 	"log"
 	"net/http"
 )
-=======
-import "github.com/HorvathAlteisen/GoTS3Bot/pkg/ts3"
->>>>>>> 1fbe8391ede2c361655100f13c10f9507e770020
 
 func main() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
-<<<<<<< HEAD
 		// Parsing Form to access it with r.Form
 		err := r.ParseForm()
 		if err != nil {
@@ -43,11 +38,9 @@ func main() {
 
 		return
 	})
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080" /*http.FileServer(http.Dir("/templates/"))*/, nil)
 
 	/*query, _ := ts3.NewQuery("127.0.0.1:10011")
-=======
->>>>>>> 1fbe8391ede2c361655100f13c10f9507e770020
 	defer query.Close()
 
 	fmt.Println(query.WelcomeMsg)
