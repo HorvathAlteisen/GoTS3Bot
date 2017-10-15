@@ -38,6 +38,7 @@ func main() {
 
 		return
 	})
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("templates/css"))))
 	http.ListenAndServe(":8080" /*http.FileServer(http.Dir("/templates/"))*/, nil)
 
 	/*query, _ := ts3.NewQuery("127.0.0.1:10011")
