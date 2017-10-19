@@ -4,9 +4,18 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+
+	"github.com/HorvathAlteisen/GoTS3Bot/pkg/webapp"
 )
 
 func main() {
+
+	app, err := webapp.NewWebApp("GoTS3Bot", "templates/*", &http.DefaultServeMux)
+
+	if err != nil {
+		log.Println(err)
+		log.Output(1, "logfile")
+	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
