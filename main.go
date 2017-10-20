@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	app, err := webapp.NewWebApp("GoTS3Bot", "templates/*", &http.DefaultServeMux)
+	_, err := webapp.NewWebApp("GoTS3Bot", "templates/", http.DefaultServeMux)
 
 	if err != nil {
 		log.Println(err)
