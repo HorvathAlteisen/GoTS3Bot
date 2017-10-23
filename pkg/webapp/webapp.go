@@ -13,11 +13,18 @@ type webApp struct {
 	title     string             // Title of the Website/app is stored in here
 	templates *template.Template // Templates are stored in here
 	serveMux  *http.ServeMux
+	pages     []page
 }
 
-type Page struct {
-	titel string
-	body  []byte
+type page struct {
+	title   string
+	content []byte
+	actions []actions
+}
+
+type actions struct {
+	name       string
+	permission string
 }
 
 // NewWebApp Initializes a new webApp struct, initialiezs path-handlers and sets path from the
