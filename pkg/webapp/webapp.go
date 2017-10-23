@@ -10,8 +10,9 @@ import (
 )
 
 type webApp struct {
-	title     string            // Title of the Website/app is stored in here
-	templates template.Template // Templates are stored in here
+	title     string             // Title of the Website/app is stored in here
+	templates *template.Template // Templates are stored in here
+	serveMux  *http.ServeMux
 }
 
 type Page struct {
@@ -19,21 +20,31 @@ type Page struct {
 	body  []byte
 }
 
-// Initializes a new webApp struct, initialiezs path-handlers and sets path from the
+// NewWebApp Initializes a new webApp struct, initialiezs path-handlers and sets path from the
 func NewWebApp(title string, pathTemplates string, serveMux *http.ServeMux) (*webApp, error) {
 
 	app := new(webApp)
 	app.title = title
-	//app.templates := template.Must(template.ParseGlob(filepath.Join(pathTemplates, "*.html")))
+	app.serveMux = serveMux
+
 	filepath.Walk("templates/", func(path string, info os.FileInfo, err error) error {
 
 		// Check if the path is pointing to a file with the ending *.html
 		if strings.HasSuffix(path, ".html") {
 
 			fmt.Println(path)
+			if app.templates == nil {
+				app.templates = template.Must(template.ParseFiles(path))
+
+				return nil
+			}
+
+			app.templates = template.Must(app.templates.ParseFiles(path))
+			fmt.Println(app.templates.DefinedTemplates())
+
+			return nil
 
 		}
-		//fmt.Println(info)
 
 		return nil
 	})

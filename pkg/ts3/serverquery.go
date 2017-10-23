@@ -49,8 +49,8 @@ func NewQuery(address string) (query *ServerQuery, err error) {
 		address += ":" + defaultPort
 	}
 
-	query.conn, err = net.DialTimeout("tcp", address, DialTimeout)
 	// If the connection fails the funtion returns an error
+	query.conn, err = net.DialTimeout("tcp", address, DialTimeout)
 	if err != nil {
 		return nil, err
 	}
