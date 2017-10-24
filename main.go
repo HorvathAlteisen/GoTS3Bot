@@ -1,55 +1,17 @@
 package main
 
 import (
-	"html/template"
-	"log"
-	"net/http"
-
 	"github.com/HorvathAlteisen/GoTS3Bot/pkg/webapp"
 )
 
 func main() {
 
-	app, err := webapp.NewWebApp("GoTS3Bot", "templates/", http.DefaultServeMux)
-	app.Start()
-
+	app, err := webapp.NewWebApp("GoTS3Bot", "templates/")
 	if err != nil {
-		log.Println(err)
-		log.Output(1, "logfile")
-	}
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-
-		// Parsing Form to access it with r.Form
-		err := r.ParseForm()
-		if err != nil {
-			log.Println(err)
-			log.Output(1, "logfile")
-
-			return
-		}
-
-		// Routing Here
-		//fmt.Fprintf(w, r.URL.Path[0:])
-		if len(r.URL.Path) == 1 {
-			http.Redirect(w, r, "/login", http.StatusFound)
-
-			return
-		}
-
-		// Template are parsed here
-		t, err := template.ParseFiles("templates/index/index.html")
-		if err != nil {
-			log.Println("executing template:", err)
-		}
-
-		// Template get executed here and send as a response to the client
-		t.ExecuteTemplate(w, "index.html", nil)
 
 		return
-	})
-	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("templates/css"))))
-	http.ListenAndServe(":8080" /*http.FileServer(http.Dir("/templates/"))*/, nil)
+	}
+	app.Run()
 
 	/*query, _ := ts3.NewQuery("127.0.0.1:10011")
 	defer query.Close()
