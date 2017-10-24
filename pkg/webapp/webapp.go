@@ -1,6 +1,7 @@
 package webapp
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -34,36 +35,43 @@ func NewWebApp(title string, pathTemplates string, serveMux *http.ServeMux) (*we
 	app.title = title
 	app.serveMux = serveMux
 
-	filepath.Walk("templates/", func(path string, info os.FileInfo, err error) error {
+	// Checks if the delivered path is existent
+	if _, err := os.Stat(pathTemplates); os.IsNotExist(err) {
+
+		return nil, errors.New("webapp: The template path is empty or non-existent")
+
+	} else if serveMux == nil {
+
+		return nil, errors.New("webapp: The serveMux mustn't be nil")
+	}
+
+	filepath.Walk(pathTemplates, func(path string, info os.FileInfo, err error) error {
+
+		fmt.Println(path)
 
 		// Check if the path is pointing to a file with the ending *.html
 		if strings.HasSuffix(path, ".html") {
 
-			fmt.Println(path)
+			// First time initialization
 			if app.templates == nil {
 				app.templates = template.Must(template.ParseFiles(path))
 
-				return nil
+				return err
 			}
 
 			app.templates = template.Must(app.templates.ParseFiles(path))
 			fmt.Println(app.templates.DefinedTemplates())
 
-			return nil
+			return err
 
 		}
 
-		return nil
+		return err
 	})
 
-	//arr, err := filepath.Glob("templates/*/*.html")
-	/*if err != nil {
-		log.Println(err)
-	}
-
-	for _, k := range arr {
-		fmt.Println(k)
-	}*/
-
 	return app, nil
+}
+
+func (app *webApp) Start() error {
+	return app.serveMux.ServeHTTP
 }
