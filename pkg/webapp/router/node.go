@@ -1,18 +1,9 @@
 package router
 
 import (
-	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
 )
-
-type Handle func(http.ResponseWriter, *http.Request, url.Values)
-
-type Router struct {
-	tree        *node
-	rootHandler Handle
-}
 
 type node struct {
 	children     []*node
@@ -21,9 +12,19 @@ type node struct {
 	methods      map[string]Handle
 }
 
-// addNode - adds a node to our tree. Will add multiple nodes if path
-// can be broken up into multiple components. Those nodes will have no
-// handler implemented and will fall through to the default handler.
+func New(rootHandler Handle) *Router {
+	node := node{component: "/", isNamedParam: false, methods: make(map[string]Handle)}
+	return &Router{tree: &node, rootHandler: rootHandler}
+}
+
+func (r *Router) Handle(method, path string, handler Handle) {
+	if path[0] != '/' {
+		panic("Path has to start with a /.")
+	}
+
+	r.tree.addNode(method, path, handler)
+}
+
 func (n *node) addNode(method, path string, handler Handle) {
 	components := strings.Split(path, "/")[1:]
 	count := len(components)
@@ -50,8 +51,6 @@ func (n *node) addNode(method, path string, handler Handle) {
 	}
 }
 
-// traverse moves along the tree adding named params as it comes and across them.
-// Returns the node and component found.
 func (n *node) traverse(components []string, params url.Values) (*node, string) {
 	component := components[0]
 	if len(n.children) > 0 { // no children, then bail out.
@@ -83,21 +82,4 @@ func (r *Router) Handle(method, path string, handler Handle) {
 	}
 
 	r.tree.addNode(method, path, handler)
-}
-
-func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	req.ParseForm()
-	fmt.Println(req.URL.Path)
-
-	// Move to middleware support
-	s := Static("templates/css")
-	s.serverStaticFiles(w, req, req.Form)
-
-	params := req.Form
-	node, _ := r.tree.traverse(strings.Split(req.URL.Path, "/")[1:], params)
-	if handler := node.methods[req.Method]; handler != nil {
-		handler(w, req, params)
-	} else {
-		r.rootHandler(w, req, params)
-	}
 }

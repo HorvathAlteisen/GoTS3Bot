@@ -76,7 +76,7 @@ func NewWebApp(title string, pathTemplates string) (*webApp, error) {
 }
 
 func (app *webApp) Run() error {
-	http.Handle("css/", http.StripPrefix("/css/", http.FileServer(http.Dir("templates/css"))))
+	//http.Handle("css/", http.StripPrefix("/css/", http.FileServer(http.Dir("templates/css"))))
 	http.ListenAndServe(":8080", app.router)
 	return nil
 }
