@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -44,8 +43,39 @@ func NewWebApp(title string, pathTemplates string) (*webApp, error) {
 
 	}
 
-	app.router = router.New(func(w http.ResponseWriter, req *http.Request, params url.Values) {
-		app.templates.ExecuteTemplate(w, "index", nil)
+	app.router = router.New(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/login", 302)
+	})
+
+	app.router.Use(router.NewStatic("static/css", "static/js"))
+
+	app.router.Handle("GET", "/login", func(w http.ResponseWriter, r *http.Request) {
+		app.templates.ExecuteTemplate(w, "login", struct{ Title string }{Title: app.title})
+		fmt.Println("GET-Method")
+		r.ParseForm()
+		fmt.Println(r.Form)
+		for k, v := range r.Form {
+			fmt.Println("key:", k)
+			fmt.Println("val:", strings.Join(v, ""))
+		}
+
+	})
+
+	app.router.Handle("POST", "/login", func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		fmt.Println("POST-Method")
+		fmt.Println(r.Form)
+		for k, v := range r.Form {
+			fmt.Println("key:", k)
+			fmt.Println("val:", strings.Join(v, ""))
+		}
+
+		http.Redirect(w, r, "/index", 302)
+
+	})
+
+	app.router.GET("/index", func(w http.ResponseWriter, r *http.Request) {
+		app.templates.ExecuteTemplate(w, "index", struct{ Title string }{Title: app.title})
 	})
 
 	filepath.Walk(pathTemplates, func(path string, info os.FileInfo, err error) error {
@@ -76,7 +106,6 @@ func NewWebApp(title string, pathTemplates string) (*webApp, error) {
 }
 
 func (app *webApp) Run() error {
-	//http.Handle("css/", http.StripPrefix("/css/", http.FileServer(http.Dir("templates/css"))))
 	http.ListenAndServe(":8080", app.router)
 	return nil
 }

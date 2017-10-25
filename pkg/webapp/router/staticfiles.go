@@ -2,43 +2,36 @@ package router
 
 import (
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 )
 
-type staticFiles struct {
-	directories []string
-}
-
-func Static(directories ...string) *staticFiles {
-	s := staticFiles{}
-	s.directories = append(s.directories, directories...)
-	if len(s.directories) <= 0 {
-		s.directories = append(s.directories, "public")
+func NewStatic(directories ...string) Middleware {
+	if len(directories) <= 0 {
+		directories = append(directories, "public")
 	}
-	return &s
-}
-
-func (s *staticFiles) serverStaticFiles(w http.ResponseWriter, r *http.Request, params url.Values) bool {
-	if r.Method != "GET" && r.Method != "HEAD" {
-		return true
-	}
-
-	for i, dir := range s.directories {
-		file := dir + r.URL.Path
-		if strings.HasSuffix(r.URL.Path, "/") {
-			file = file + "index.html"
+	return Middleware(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+		if r.Method != "GET" && r.Method != "HEAD" {
+			next(w, r)
+			return // bail out.
 		}
 
-		if _, err := os.Stat(file); err != nil {
-			if i+1 == len(s.directories) {
-				return true
+		for i, dir := range directories {
+			file := dir + r.URL.Path
+			if strings.HasSuffix(r.URL.Path, "/") {
+				file = file + "index.html"
 			}
-			continue
+
+			if _, err := os.Stat(file); err != nil {
+				if i+1 == len(directories) {
+					next(w, r)
+					return
+				}
+				continue
+			}
+			http.ServeFile(w, r, file)
+			return
 		}
-		http.ServeFile(w, r, file)
-		return false
-	}
-	return true
+		next(w, r)
+	})
 }
